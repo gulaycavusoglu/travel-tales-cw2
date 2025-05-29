@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countries - Travel Tales</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        .countries-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .country-card {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        .country-card:hover {
+            transform: translateY(-5px);
+        }
+        .country-flag {
+            height: 160px;
+            background-size: cover;
+            background-position: center;
+            background-color: #f1f1f1;
+        }
+        .country-content {
+            padding: 1rem;
+        }
+        .country-name {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        .country-capital {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+        .search-container {
+            margin: 2rem 0;
+            text-align: center;
+        }
+        .no-countries {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">Travel Tales</div>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <% if (user) { %>
+                    <a href="/post/create">Create Post</a>
+                    <a href="/profile">Profile</a>
+                    <a href="/logout">Logout</a>
+                <% } else { %>
+                    <a href="/login">Login</a>
+                    <a href="/register">Register</a>
+                <% } %>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <h1 class="text-center">Explore Countries</h1>
+
+        <!-- Country Dropdown -->
+        <div class="search-container">
+            <label for="countryDropdown" style="font-weight:bold;">Select a country:</label>
+            <select id="countryDropdown" style="margin-left:1rem; padding:0.5rem; min-width:200px;">
+                <option value="">-- Choose a country --</option>
+                <% countries.forEach(country => { %>
+                    <option value="<%= country.name %>"><%= country.name %></option>
+                <% }) %>
+            </select>
+        </div>
+
+        <!-- Country Details Display -->
+        <div id="countryDetails" style="margin:2rem auto; max-width:500px; display:none; border:1px solid #eee; border-radius:8px; padding:1.5rem; background:#fafcff;"></div>
+
+        <div class="countries-grid">
+            <% if (countries && countries.length > 0) { %>
+                <% countries.forEach(country => { %>
+                    <a href="/country/<%= country.id %>" class="country-card">
+                        <div class="country-flag" style="background-image: url('<%= country.flag || 'https://via.placeholder.com/300x150?text=No+Flag' %>')"></div>
+                        <div class="country-content">
+                            <div class="country-name"><%= country.name %></div>
+                            <div class="country-capital">
+                                <% if (country.capital) { %>
+                                    Capital: <%= country.capital %>
+                                <% } else { %>
+                                    No capital information
+                                <% } %>
+                            </div>
+                        </div>
+                    </a>
+                <% }) %>
+            <% } else { %>
+                <div class="no-countries">
+                    <h2>No countries found</h2>
+                    <p>Try a different search term or check back later.</p>
+                </div>
+            <% } %>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropdown = document.getElementById('countryDropdown');
+            const detailsDiv = document.getElementById('countryDetails');
+            dropdown.addEventListener('change', async function() {
+                const countryName = this.value;
+                if (!countryName) {
+                    detailsDiv.style.display = 'none';
+                    detailsDiv.innerHTML = '';
+                    return;
+                }
+                detailsDiv.innerHTML = 'Loading...';
+                detailsDiv.style.display = 'block';
+                try {
+                    const res = await fetch(`/api/country-details?name=${encodeURIComponent(countryName)}`);
+                    const data = await res.json();
+                    if (data.success) {
+                        const c = data.data;
+                        detailsDiv.innerHTML = `
+                            <div style="text-align:center;">
+                                <img src="${c.flag}" alt="Flag of ${c.name}" style="width:120px; height:auto; border-radius:4px; box-shadow:0 2px 5px rgba(0,0,0,0.1); margin-bottom:1rem;" />
+                                <h2 style="margin:0.5rem 0;">${c.name}</h2>
+                                <p><strong>Capital:</strong> ${c.capital}</p>
+                                <p><strong>Currency:</strong> ${c.currency}</p>
+                            </div>
+                        `;
+                    } else {
+                        detailsDiv.innerHTML = `<div style='color:red;'>${data.error || 'Country details not found.'}</div>`;
+                    }
+                } catch (err) {
+                    detailsDiv.innerHTML = `<div style='color:red;'>Error fetching country details.</div>`;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

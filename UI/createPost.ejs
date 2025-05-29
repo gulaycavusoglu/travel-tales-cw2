@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Blog Post - Travel Tales</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        .form-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 0.7rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        textarea {
+            min-height: 120px;
+        }
+        .btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        .error-message {
+            color: red;
+            margin-bottom: 1rem;
+        }
+        .country-info-preview {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            display: none;
+        }
+        .country-flag {
+            height: 24px;
+            margin-right: 10px;
+            border: 1px solid #ddd;
+        }
+        .country-details {
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">Travel Tales</div>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <% if (user) { %>
+<!--                    <a href="/feed">Following Feed</a>-->
+                    <a href="/post/create">Create Post</a>
+                    <a href="/profile">Profile</a>
+                    <a href="/logout">Logout</a>
+                <% } else { %>
+                    <a href="/login">Login</a>
+                    <a href="/register">Register</a>
+                <% } %>
+            </div>
+        </nav>
+    </header>
+    <main>
+        <div class="form-container">
+            <h1>Create a New Blog Post</h1>
+            <% if (typeof error !== 'undefined') { %>
+                <div class="error-message"><%= error %></div>
+            <% } %>
+            <form action="/post" method="POST">
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <input type="text" id="title" name="title" value="<%= formData && formData.title ? formData.title : '' %>" required>
+                </div>
+                <div class="form-group">
+                    <label for="content">Content</label>
+                    <textarea id="content" name="content" required><%= formData && formData.content ? formData.content : '' %></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="country_name">Country Name</label>
+                    <select id="country_name" name="country_name" required>
+                        <option value="">Select a country</option>
+                        <!-- Will be populated by JavaScript -->
+                    </select>
+                    <div id="country-info-preview" class="country-info-preview">
+                        <img id="country-flag-preview" class="country-flag" src="" alt="Flag">
+                        <div class="country-details">
+                            <span id="country-capital-preview"></span> |
+                            <span id="country-languages-preview"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="date_of_visit">Date of Visit</label>
+                    <input type="date" id="date_of_visit" name="date_of_visit" value="<%= formData && formData.date_of_visit ? formData.date_of_visit : '' %>" required>
+                </div>
+                <button type="submit" class="btn">Create Post</button>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            const countryDropdown = document.getElementById('country_name');
+            const countryInfoPreview = document.getElementById('country-info-preview');
+            const countryFlagPreview = document.getElementById('country-flag-preview');
+            const countryCapitalPreview = document.getElementById('country-capital-preview');
+            const countryLanguagesPreview = document.getElementById('country-languages-preview');
+            
+            // Load countries for dropdown
+            try {
+                const response = await fetch('/api/countries');
+                const data = await response.json();
+                
+                if (data.success && data.data.length > 0) {
+                    // Populate dropdown with countries
+                    data.data.forEach(country => {
+                        const option = document.createElement('option');
+                        option.value = country.name;
+                        option.textContent = country.name;
+                        countryDropdown.appendChild(option);
+                    });
+                    
+                    // Set the selected country if formData exists
+                    <% if (formData && formData.country_name) { %>
+                        countryDropdown.value = "<%= formData.country_name %>";
+                        // Load country details if a country is pre-selected
+                        if (countryDropdown.value) {
+                            loadCountryDetails(countryDropdown.value);
+                        }
+                    <% } %>
+                } else {
+                    console.error('Failed to load countries');
+                }
+            } catch (error) {
+                console.error('Error loading countries:', error);
+            }
+            
+            // Add change event to show country details
+            countryDropdown.addEventListener('change', function() {
+                const selectedCountry = this.value;
+                if (selectedCountry) {
+                    loadCountryDetails(selectedCountry);
+                } else {
+                    countryInfoPreview.style.display = 'none';
+                }
+            });
+            
+            // Function to load country details
+            async function loadCountryDetails(countryName) {
+                try {
+                    const response = await fetch(`/api/country-details?name=${encodeURIComponent(countryName)}`);
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        // Update the preview section
+                        countryFlagPreview.src = data.data.flag;
+                        countryCapitalPreview.textContent = `Capital: ${data.data.capital}`;
+                        countryLanguagesPreview.textContent = `Languages: ${data.data.languages}`;
+                        countryInfoPreview.style.display = 'flex';
+                    } else {
+                        countryInfoPreview.style.display = 'none';
+                    }
+                } catch (error) {
+                    console.error('Error loading country details:', error);
+                    countryInfoPreview.style.display = 'none';
+                }
+            }
+        });
+    </script>
+</body>
+</html> 

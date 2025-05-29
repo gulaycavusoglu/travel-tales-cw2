@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  app:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./data:/app/data
+      - ./public:/app/public
+    environment:
+      - PORT=5000
+      - JWT_SECRET=travel-tales-docker-jwt-secret
+      - ALLOWED_ORIGINS=http://localhost:5000
+      - CW1_API_KEY=demo-api-key
+    depends_on:
+        - country-info
+    restart: unless-stopped
+  
+  country-info:
+    build:
+      context: ./advanced-web-dev-cw1
+    ports:
+      - "7000:7000"
+    volumes:
+      - ./advanced-web-dev-cw1/data:/app/data
+    environment:
+      - PORT=7000
+    restart: unless-stopped 

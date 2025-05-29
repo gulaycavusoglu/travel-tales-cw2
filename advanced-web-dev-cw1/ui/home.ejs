@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Home</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .section {
+            margin-bottom: 30px;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .api-key {
+            background-color: #f5f5f5;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        button {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button.delete {
+            background-color: #f44336;
+        }
+        .success-message {
+            color: green;
+            margin-bottom: 10px;
+        }
+        .error-message {
+            color: red;
+            margin-bottom: 10px;
+        }
+        .code-block {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            margin-top: 10px;
+        }
+        .admin-section {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e8f4fe;
+            border-radius: 4px;
+            border-left: 5px solid #2196F3;
+        }
+        .admin-link {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 16px;
+            background-color: #2196F3;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .logout-btn {
+            padding: 8px 16px;
+            background-color: #f44336;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="user-info">
+            <h1>Home Page</h1>
+            <p>Welcome: <%= data.fn %> <%= data.sn %></p>
+        </div>
+        <a href="/logout" class="logout-btn">Logout</a>
+    </div>
+
+    <% if (data.is_admin) { %>
+        <div class="admin-section">
+            <h3>Admin Access</h3>
+            <p>You have administrator privileges. As an admin, you can access the dashboard to manage users and their API keys.</p>
+            <a href="/admin" class="admin-link">Go to Admin Dashboard</a>
+        </div>
+    <% } %>
+
+    <!-- Only show the API key generation/usage sections to NON-admin users -->
+    <% if (!data.is_admin) { %>
+
+    <div class="section">
+        <h2>API Keys</h2>
+        <p>Generate and manage your API key for accessing the REST API.</p>
+
+        <% if (typeof apiKeyMessage !== 'undefined') { %>
+            <% if (apiKeyMessage.success) { %>
+                <div class="success-message"><%= apiKeyMessage.message %></div>
+            <% } else { %>
+                <div class="error-message"><%= apiKeyMessage.message %></div>
+            <% } %>
+        <% } %>
+
+        <!-- Show newly created API key -->
+        <% if (typeof newApiKey !== 'undefined' && newApiKey) { %>
+            <h3>Your New API Key:</h3>
+            <div class="api-key">
+                <div>
+                    <strong><%= newApiKey %></strong><br>
+                    <small>Created: <%= new Date().toLocaleString() %></small>
+                </div>
+            </div>
+            <p><strong>Important:</strong> Copy this key now. For security reasons, you won't be able to see it again.</p>
+        <% } %>
+
+        <!-- Generate API Key button -->
+        <form action="/generate-api-key" method="POST">
+            <button type="submit">Generate New API Key</button>
+        </form>
+        <p>You can generate a new API key at any time.</p>
+    </div>
+
+    <div class="section">
+        <h2>How to Use Your API Key</h2>
+        <p>You can use your API key to access our REST API using tools like Rester or Postman.</p>
+        <div class="endpoint">
+            <h4>See a country details</h4>
+            <div class="code-block">
+GET localhost:7000/api/v3.1/name/&lt;countryName&gt;
+Authorization: Bearer YOUR_API_KEY
+            </div>
+        </div>
+    </div>
+
+    <% } %> <!-- End if (!data.is_admin) -->
+
+</body>
+</html>

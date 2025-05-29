@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Tales - Share Your Adventures</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        header {
+            background-color: #3498db;
+            color: white;
+            padding: 1rem;
+            /*box-shadow: 0 2px 5px rgba(0,0,0,0.1);*/
+        }
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem;
+        }
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .hero {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        /*.cta-button {*/
+        /*    display: inline-block;*/
+        /*    background-color: #2ecc71;*/
+        /*    color: white;*/
+        /*    padding: 0.7rem 1.5rem;*/
+        /*    border-radius: 4px;*/
+        /*    text-decoration: none;*/
+        /*    font-weight: bold;*/
+        /*}*/
+        /*.cta-button:hover {*/
+        /*    background-color: #27ae60;*/
+        /*}*/
+        /*.filters {*/
+        /*    display: flex;*/
+        /*    justify-content: space-between;*/
+        /*    align-items: center;*/
+        /*    margin-bottom: 1.5rem;*/
+        /*    padding-bottom: 1rem;*/
+        /*    border-bottom: 1px solid #eee;*/
+        /*}*/
+        .sort-options {
+            display: flex;
+            gap: 1rem;
+        }
+        .sort-options a {
+            color: #666;
+            text-decoration: none;
+            padding: 0.3rem 0.5rem;
+            border-radius: 4px;
+        }
+        .sort-options a.active {
+            background-color: #f1f1f1;
+            font-weight: bold;
+            color: #333;
+        }
+        /*.search-form button {*/
+        /*    background-color: #3498db;*/
+        /*    color: white;*/
+        /*    border: none;*/
+        /*    padding: 0.5rem 1rem;*/
+        /*    border-radius: 4px;*/
+        /*    cursor: pointer;*/
+        /*}*/
+        /*.posts {*/
+        /*    display: grid;*/
+        /*    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));*/
+        /*    gap: 2rem;*/
+        /*}*/
+        /*.post-card {*/
+        /*    border: 1px solid #eee;*/
+        /*    border-radius: 8px;*/
+        /*    overflow: hidden;*/
+        /*    box-shadow: 0 2px 5px rgba(0,0,0,0.1);*/
+        /*    transition: transform 0.3s ease;*/
+        /*}*/
+        /*.post-card:hover {*/
+        /*    transform: translateY(-5px);*/
+        /*}*/
+        /*.post-image {*/
+        /*    height: 150px;*/
+        /*    background-color: #ddd;*/
+        /*    background-size: cover;*/
+        /*    background-position: center;*/
+        /*}*/
+        /*.post-content {*/
+        /*    padding: 1rem;*/
+        /*}*/
+        /*.post-title {*/
+        /*    font-size: 1.2rem;*/
+        /*    margin-bottom: 0.5rem;*/
+        /*}*/
+        /*.post-meta {*/
+        /*    display: flex;*/
+        /*    justify-content: space-between;*/
+        /*    font-size: 0.9rem;*/
+        /*    color: #666;*/
+        /*    margin-bottom: 0.5rem;*/
+        /*}*/
+        /*.post-excerpt {*/
+        /*    color: #666;*/
+        /*    margin-bottom: 1rem;*/
+        /*}*/
+        /*.read-more {*/
+        /*    display: inline-block;*/
+        /*    color: #3498db;*/
+        /*    text-decoration: none;*/
+        /*    font-weight: bold;*/
+        /*}*/
+        /*.read-more:hover {*/
+        /*    text-decoration: underline;*/
+        /*}*/
+        /*.no-posts {*/
+        /*    text-align: center;*/
+        /*    padding: 2rem;*/
+        /*    color: #666;*/
+        /*}*/
+        /*.pagination {*/
+        /*    display: flex;*/
+        /*    justify-content: center;*/
+        /*    gap: 0.5rem;*/
+        /*    margin-top: 2rem;*/
+        /*}*/
+        /*.pagination a, .pagination span {*/
+        /*    display: inline-block;*/
+        /*    padding: 0.5rem 1rem;*/
+        /*    border: 1px solid #ddd;*/
+        /*    border-radius: 4px;*/
+        /*    text-decoration: none;*/
+        /*    color: #333;*/
+        /*}*/
+        /*.pagination a:hover {*/
+        /*    background-color: #f1f1f1;*/
+        /*}*/
+        /*.pagination .active {*/
+        /*    background-color: #3498db;*/
+        /*    color: white;*/
+        /*    border-color: #3498db;*/
+        /*}*/
+        /*footer {*/
+        /*    background-color: #f5f5f5;*/
+        /*    padding: 2rem 1rem;*/
+        /*    text-align: center;*/
+        /*    color: #666;*/
+        /*    margin-top: 3rem;*/
+        /*}*/
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">Travel Tales</div>
+            <div class="nav-links">
+                <a href="/">Home</a>
+<!--                <a href="/countries">Countries</a>-->
+                <% if (user) { %>
+<!--                    <a href="/feed">Following Feed</a>-->
+                    <a href="/post/create">Create Post</a>
+                    <a href="/profile">Profile</a>
+                    <a href="/logout">Logout</a>
+                <% } else { %>
+                    <a href="/login">Login</a>
+                    <a href="/register">Register</a>
+                <% } %>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Country Selector and Info Display -->
+        <div id="country-selector" style="background-color: #f5f5f5; padding: 1rem; border-radius: 5px; margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <label for="country-dropdown" style="font-weight: bold; margin-right: 10px;">Select a country: </label>
+                    <select id="country-dropdown" style="padding: 8px; border-radius: 4px; border: 1px solid #ddd;">
+                        <option value="">Choose a country</option>
+                        <!-- Will be populated by JavaScript -->
+                    </select>
+                </div>
+                <div id="country-info" style="display: none; align-items: center;">
+                    <img id="country-flag" src="" alt="Flag" style="height: 30px; margin-right: 10px; border: 1px solid #ddd;">
+                    <span id="country-name" style="font-weight: bold; margin-right: 15px;"></span>
+                    <span id="country-capital" style="margin-right: 15px;"></span>
+                    <span id="country-languages"></span>
+                </div>
+            </div>
+        </div>
+
+<!--        <section class="hero">-->
+<!--            <h1>Share Your Travel Adventures</h1>-->
+<!--            <p>Discover amazing places around the world and share your own experiences.</p>-->
+<!--            <% if (!user) { %>-->
+<!--                <a href="/register" class="cta-button">Join Now</a>-->
+<!--            <% } else { %>-->
+<!--                <a href="/post/create" class="cta-button">Create a Post</a>-->
+<!--            <% } %>-->
+<!--        </section>-->
+
+        <section class="filters">
+            <div class="sort-options">
+                <a href="/?sort=newest<%= locals.selectedCountry ? '&country=' + encodeURIComponent(selectedCountry) : '' %>" class="<%= sortBy === 'newest' ? 'active' : '' %>">Newest</a>
+                <a href="/?sort=most_liked<%= locals.selectedCountry ? '&country=' + encodeURIComponent(selectedCountry) : '' %>" class="<%= sortBy === 'most_liked' ? 'active' : '' %>">Most liked</a>
+                <a href="/?sort=most_commented<%= locals.selectedCountry ? '&country=' + encodeURIComponent(selectedCountry) : '' %>" class="<%= sortBy === 'most_commented' ? 'active' : '' %>">Most commented</a>
+            </div>
+        </section>
+
+        <section class="posts">
+            <% if (posts && posts.length > 0) { %>
+                <% posts.forEach(post => { %>
+                    <div class="post-card">
+                        <div class="post-content">
+                            <h2 class="post-title"><a href="/post/<%= post.id %>"><%= post.title %></a></h2>
+                            <div class="post-meta">
+                                By <%= post.author_name %> <%= post.author_surname %>
+                                <% if (user && user.id !== post.user_id) { %>
+                                    <span id="follow-btn-<%= post.user_id %>">
+                                    <% if (followingAuthors && followingAuthors[post.user_id]) { %>
+                                        <!-- Unfollow button removed -->
+                                    <% } else { %>
+                                        <button class="btn btn-sm follow-btn" data-user-id="<%= post.user_id %>">Follow</button>
+                                    <% } %>
+                                    </span>
+                                <% } %>
+                                | Country: <%= post.country_name ? post.country_name : 'N/A' %> |
+                                Date of Visit: <%= post.date_of_visit %>
+                            </div>
+                            <p class="post-excerpt">
+                                <%= post.content.length > 100 ? post.content.substring(0, 100) + '...' : post.content %>
+                            </p>
+                            <a href="/post/<%= post.id %>" class="read-more">Read More</a>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <div class="no-posts">
+                    <h2>No posts found</h2>
+                    <p>Be the first to share your travel experience!</p>
+                    <% if (user) { %>
+                        <a href="/post/create" class="cta-button">Create a Post</a>
+                    <% } else { %>
+                        <a href="/register" class="cta-button">Join Now</a>
+                    <% } %>
+                </div>
+            <% } %>
+        </section>
+
+        <% if (pagination && pagination.totalPages > 1) { %>
+            <div class="pagination">
+                <% if (pagination.page > 1) { %>
+                    <a href="/?page=<%= pagination.page - 1 %>&sort=<%= sortBy %><%= locals.selectedCountry ? '&country=' + encodeURIComponent(selectedCountry) : '' %>">Previous</a>
+                <% } %>
+                
+                <% for (let i = 1; i <= pagination.totalPages; i++) { %>
+                    <% if (i === pagination.page) { %>
+                        <span class="active"><%= i %></span>
+                    <% } else if (i === 1 || i === pagination.totalPages || (i >= pagination.page - 1 && i <= pagination.page + 1)) { %>
+                        <a href="/?page=<%= i %>&sort=<%= sortBy %><%= locals.selectedCountry ? '&country=' + encodeURIComponent(selectedCountry) : '' %>"><%= i %></a>
+                    <% } else if (i === pagination.page - 2 || i === pagination.page + 2) { %>
+                        <span>...</span>
+                    <% } %>
+                <% } %>
+                
+                <% if (pagination.page < pagination.totalPages) { %>
+                    <a href="/?page=<%= pagination.page + 1 %>&sort=<%= sortBy %><%= locals.selectedCountry ? '&country=' + encodeURIComponent(selectedCountry) : '' %>">Next</a>
+                <% } %>
+            </div>
+        <% } %>
+    </main>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.follow-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const userId = this.getAttribute('data-user-id');
+                fetch(`/user/${userId}/follow`, {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json' }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        // After successful follow, hide the button
+                        document.getElementById('follow-btn-' + userId).innerHTML = '';
+                    }
+                });
+            });
+        });
+        // Unfollow functionality removed
+
+        // Country dropdown functionality
+        try {
+            // Fetch countries list
+            fetch('/api/countries')
+            .then(res => res.json())
+            .then(countriesData => {
+                if (countriesData.success) {
+                    const dropdown = document.getElementById('country-dropdown');
+                    
+                    // Populate dropdown with countries
+                    countriesData.data.forEach(country => {
+                        const option = document.createElement('option');
+                        option.value = country.name;
+                        option.textContent = country.name;
+                        dropdown.appendChild(option);
+                    });
+                    
+                    // Add change event listener
+                    dropdown.addEventListener('change', function() {
+                        const countryName = this.value;
+                        const countryInfo = document.getElementById('country-info');
+                        
+                        if (!countryName) {
+                            // If no country selected, go to homepage without filter
+                            window.location.href = '/';
+                            return;
+                        }
+                        
+                        // Filter posts by country
+                        window.location.href = `/?country=${encodeURIComponent(countryName)}`;
+                    });
+
+                    // Set the selected country if one is already filtered
+                    <% if (locals.selectedCountry) { %>
+                    const options = dropdown.querySelectorAll('option');
+                    options.forEach(option => {
+                        if (option.value === '<%= selectedCountry %>') {
+                            option.selected = true;
+                            
+                            // Also show country info for the selected country
+                            fetch(`/api/country-details?name=${encodeURIComponent('<%= selectedCountry %>')}`)
+                            .then(res => res.json())
+                            .then(detailsData => {
+                                if (detailsData.success) {
+                                    const c = detailsData.data;
+                                    document.getElementById('country-flag').src = c.flag;
+                                    document.getElementById('country-name').textContent = c.name;
+                                    document.getElementById('country-capital').textContent = `Capital: ${c.capital}`;
+                                    document.getElementById('country-languages').textContent = `Languages: ${c.languages}`;
+                                    document.getElementById('country-info').style.display = 'flex';
+                                }
+                            });
+                        }
+                    });
+                    <% } %>
+                }
+            })
+            .catch(error => {
+                console.error('Error loading countries:', error);
+            });
+        } catch (error) {
+            console.error('Error initializing country dropdown:', error);
+        }
+    });
+    </script>
+
+<!--    <footer>-->
+<!--        <p>&copy; <%= new Date().getFullYear() %> Travel Tales. All rights reserved.</p>-->
+<!--    </footer>-->
+</body>
+</html> 

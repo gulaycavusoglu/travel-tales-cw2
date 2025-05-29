@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Travel Tales</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        .profile-container {
+            max-width: 900px;
+            margin: 2rem auto;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .profile-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #eee;
+        }
+        .profile-name {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        .profile-email {
+            color: #666;
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+        }
+        .tab-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        .tab-link {
+            padding: 0.8rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-size: 1.1rem;
+        }
+        .tab-link.active {
+            border-bottom-color: #3498db;
+            font-weight: bold;
+            color: #3498db;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .user-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .user-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        .user-item:last-child {
+            border-bottom: none;
+        }
+        .user-details {
+            flex: 1;
+        }
+        .user-name {
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+        .user-email {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        .user-actions {
+            margin-left: 1rem;
+        }
+        /*.empty-state {*/
+        /*    text-align: center;*/
+        /*    padding: 2rem;*/
+        /*    background-color: #f0f0f0;*/
+        /*    border-radius: 8px;*/
+        /*    color: #666;*/
+        /*}*/
+        .btn {
+            display: inline-block;
+            padding: 0.7rem 1.2rem;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+        }
+        .btn-danger {
+            background-color: #e74c3c;
+        }
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">Travel Tales</div>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <% if (user) { %>
+                    <a href="/post/create">Create Post</a>
+                    <a href="/profile">Profile</a>
+                    <a href="/logout">Logout</a>
+                <% } else { %>
+                    <a href="/login">Login</a>
+                    <a href="/register">Register</a>
+                <% } %>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="profile-container">
+            <div class="profile-header">
+                <h1 class="profile-name"><%= user.name %> <%= user.surname %></h1>
+                <div class="profile-email"><%= user.email %></div>
+                
+                <% if (!isCurrentUser && locals.user) { %>
+                    <div style="margin-top: 15px;">
+                        <% if (isFollowing) { %>
+                            <!-- Unfollow button removed -->
+                        <% } else { %>
+                            <form action="/user/<%= user.id %>/follow" method="POST" style="display: inline-block;">
+                                <button type="submit" class="btn">Follow</button>
+                            </form>
+                        <% } %>
+                    </div>
+                <% } %>
+            </div>
+
+            <div class="profile-tabs">
+                <div class="tab-links">
+                    <div class="tab-link active" data-tab="followers">Followers</div>
+                    <div class="tab-link" data-tab="following">Following</div>
+                </div>
+
+                <div id="followers" class="tab-content active">
+                    <% if (followers && followers.length > 0) { %>
+                        <ul class="user-list">
+                            <% followers.forEach(follower => { %>
+                                <li class="user-item">
+                                    <div class="user-details">
+                                        <div class="user-name"><%= follower.name %> <%= follower.surname %></div>
+                                        <div class="user-email"><%= follower.email %></div>
+                                    </div>
+                                    <div class="user-actions">
+                                        <a href="/user/<%= follower.id %>" class="btn btn-sm">View Profile</a>
+                                    </div>
+                                </li>
+                            <% }); %>
+                        </ul>
+                    <% } else { %>
+<!--                        <div class="empty-state">-->
+<!--                            <h3>They don't have any followers yet</h3>-->
+<!--                            <p>As you share more travel stories, people will follow you!</p>-->
+<!--                        </div>-->
+                    <% } %>
+                </div>
+
+                <div id="following" class="tab-content">
+                    <% if (following && following.length > 0) { %>
+                        <ul class="user-list">
+                            <% following.forEach(followed => { %>
+                                <li class="user-item">
+                                    <div class="user-details">
+                                        <div class="user-name"><%= followed.name %> <%= followed.surname %></div>
+                                        <div class="user-email"><%= followed.email %></div>
+                                    </div>
+                                    <div class="user-actions">
+                                        <a href="/user/<%= followed.id %>" class="btn btn-sm">View Profile</a>
+                                        <!-- Unfollow button removed -->
+                                    </div>
+                                </li>
+                            <% }); %>
+                        </ul>
+                    <% } else { %>
+<!--                        <div class="empty-state">-->
+<!--                            <h3>You're not following anyone yet</h3>-->
+<!--                            <p>Follow other users to see their travel stories!</p>-->
+<!--                            <a href="/" class="btn">Discover Users</a>-->
+<!--                        </div>-->
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Simple tab functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabLinks = document.querySelectorAll('.tab-link');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    // Remove active class from all tabs
+                    tabLinks.forEach(tab => tab.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    // Add active class to current tab
+                    this.classList.add('active');
+                    document.getElementById(this.dataset.tab).classList.add('active');
+                });
+            });
+
+            // Handle follow buttons
+            document.querySelectorAll('.profile-header form').forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    // Extract the user ID from the form action URL
+                    const urlParts = this.action.split('/');
+                    const userId = urlParts[urlParts.length - 2]; // Get the ID from the URL pattern /user/:id/follow
+                    
+                    console.log(`Following user ID:`, userId);
+                    console.log('Form action:', this.action);
+                    
+                    // Send the follow request
+                    fetch(this.action, {
+                        method: 'POST',
+                        headers: { 'Accept': 'application/json' }
+                    })
+                    .then(res => {
+                        console.log('Response status:', res.status);
+                        return res.json();
+                    })
+                    .then(data => {
+                        console.log(`Follow response:`, data);
+                        if (data.success) {
+                            // Handle the profile header button update
+                            const profileHeaderForm = document.querySelector('.profile-header form');
+                            if (profileHeaderForm && profileHeaderForm === this) {
+                                const container = profileHeaderForm.parentElement;
+                                // After successful follow, remove the button
+                                container.innerHTML = '';
+                            }
+                        } else {
+                            console.error(`Failed to follow:`, data.error);
+                            alert(`Failed to follow: ${data.error || 'Unknown error'}`);
+                        }
+                    })
+                    .catch(error => {
+                        console.error(`Error following user:`, error);
+                        alert(`Error following user. Please try again.`);
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html> 
